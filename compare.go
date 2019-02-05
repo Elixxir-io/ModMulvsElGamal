@@ -91,7 +91,9 @@ func main(){
 	z := big.NewInt(0)
 	q := big.NewInt(0)
 	
-	//Compute total amount of time the multiplications take
+	// Compute total amount of time the multiplications take
+	// inefficent implentation of Modular Multiplication due to doing modular reduction
+	// post multiplication.
 	timeStartMul := time.Now()
 	for i := 0; i < nOpsMul; i++ {
 		z = z.Mul(inputA[i],inputB[i])
@@ -120,7 +122,9 @@ func main(){
 	fmt.Printf("diferential factor: %v \n", factor)	
 }
 
-//Implementation of ElGamal encryption function based on https://en.wikipedia.org/wiki/ElGamal_encryption
+// Implementation of ElGamal encryption function based on https://en.wikipedia.org/wiki/ElGamal_encryption
+// Is not secure, golang's big.Int is not constant time.  This implementation should never be used beyond
+// this test.
 func ElgamalEncrypt(x, y, g, p, m *big.Int)(*big.Int, *big.Int){
 	c1 := big.NewInt(0).Exp(g,y,p)
 	s := big.NewInt(0).Exp(c1,x,p)
@@ -130,7 +134,7 @@ func ElgamalEncrypt(x, y, g, p, m *big.Int)(*big.Int, *big.Int){
 	return c1, c2
 }
 
-//Brute force random number generation within cyclic group
+//Brute force psudo-random number generation within cyclic group
 func RNGinPrime(r *rand.Rand, pmin1 *big.Int)(*big.Int){
 
 	cmpPrime := 1
