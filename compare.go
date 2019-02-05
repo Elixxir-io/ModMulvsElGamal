@@ -1,3 +1,25 @@
+////////////////////////////////////////////////////////////////////////////////
+// Copyright © 2019 Elixxir                                                    /
+//                                                                             /
+// Permission is hereby granted, free of charge, to any person obtaining a     /
+// copy of this software and associated documentation files (the “Software”),  /
+// to deal in the Software without restriction, including without limitation   /
+// the rights to use, copy, modify, merge, publish, distribute, sublicense,    /
+// and/or sell copies of the Software, and to permit persons to whom the       /
+// Software is furnished to do so, subject to the following conditions:        /
+//                                                                             /
+// The above copyright notice and this permission notice shall be included in  /
+// all copies or substantial portions of the Software.                         /
+//                                                                             /
+// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  /
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,    /
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE /
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER      /
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING     /
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER         /
+// DEALINGS IN THE SOFTWARE.                                                   /
+////////////////////////////////////////////////////////////////////////////////
+
 package main
 
 import (
@@ -7,16 +29,18 @@ import (
 	"time"
 )
 
+/*The goal of this code is to roughly discern the relative compute time of modular multiplication verses ElGamal.  Given the concern with timing, simple to understand implementations have been chosen over cryptographically valid implementations. */
+
 //Group Size
 const BitLen = 4096
 const ByteLen = BitLen>>3
 
 //Number of iterations on timeing test
 const nOpsMul = 10000
-const nOpsExp = 1
+const nOpsExp = 1000
 
 func main(){
-	//Strong 4096 bit Prime from https://tools.ietf.org/html/rfc3526
+	//Strong 4096 bit Prime from https://tools.ietf.org/html/rfc3526#page-5
 	primeString := "FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1" +
       "29024E088A67CC74020BBEA63B139B22514A08798E3404DD" +
       "EF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245" +
@@ -44,9 +68,7 @@ func main(){
 	p := big.NewInt(0)
 	p.SetString(primeString, 16)
 	
-	pmin1 := big.NewInt(0)
-	
-	pmin1 = big.NewInt(0).Sub(p,big.NewInt(1))
+	psub1 := big.NewInt(0).Sub(p,big.NewInt(1))
 	
 	//generator
 	g := big.NewInt(2)
@@ -58,11 +80,11 @@ func main(){
 	var inputC []*big.Int
 	
 	for i := 0; i < nOpsMul; i++ {
-		nint := RNGinPrime(r,pmin1)
+		nint := RNGinPrime(r,psub1)
 		inputA = append(inputA,nint)
-		mint := RNGinPrime(r,pmin1)
+		mint := RNGinPrime(r,psub1)
 		inputB = append(inputB,mint)
-		kint := RNGinPrime(r,elgamalExpSize)
+		kint := RNGinPrime(r,psub1)
 		inputC = append(inputC,kint)
 	}
 	
@@ -124,5 +146,3 @@ func RNGinPrime(r *rand.Rand, pmin1 *big.Int)(*big.Int){
 
 	return nint
 }
-
-
