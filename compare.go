@@ -88,16 +88,11 @@ func main(){
 		inputC = append(inputC,kint)
 	}
 	
-	z := big.NewInt(0)
-	q := big.NewInt(0)
-	
 	// Compute total amount of time the multiplications take
-	// inefficent implentation of Modular Multiplication due to doing modular reduction
 	// post multiplication.
 	timeStartMul := time.Now()
 	for i := 0; i < nOpsMul; i++ {
-		z = z.Mul(inputA[i],inputB[i])
-		q = q.Mod(z, p)
+		ModMul(inputA[i],inputB[i],p)
 
 	}
 	timeEndMul := time.Now()
@@ -133,6 +128,16 @@ func ElgamalEncrypt(x, y, g, p, m *big.Int)(*big.Int, *big.Int){
 	
 	return c1, c2
 }
+
+// Implementation of modular multiplication 
+// inefficent implentation of Modular Multiplication due to doing modular reduction 
+// post full multiplication
+func ModMul(a,b,p *big.Int)*big.Int{
+	z := big.NewInt(0).Mul(a,b)
+	q := big.NewInt(0).Mod(z, p)
+	return q
+}
+
 
 //Brute force psudo-random number generation within cyclic group
 func RNGinPrime(r *rand.Rand, pmin1 *big.Int)(*big.Int){
